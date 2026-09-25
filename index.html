@@ -1,0 +1,1671 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#f4f7fb">
+<title>Class 10 Statistics • Mean Calculator</title>
+
+<style>
+    :root {
+        --bg: #f4f7fb;
+        --white: #ffffff;
+        --text: #172033;
+        --muted: #64748b;
+        --border: #e2e8f0;
+        --blue: #2563eb;
+        --blue-dark: #1d4ed8;
+        --blue-light: #eff6ff;
+        --green: #15803d;
+        --green-light: #ecfdf5;
+        --amber: #b45309;
+        --amber-light: #fffbeb;
+        --slate: #0f172a;
+        --row-alt: #f8fafc;
+        --shadow: 0 8px 28px rgba(15, 23, 42, 0.06);
+    }
+
+    * {
+        box-sizing: border-box;
+    }
+
+    html {
+        scroll-behavior: smooth;
+    }
+
+    body {
+        margin: 0;
+        min-height: 100vh;
+        background: var(--bg);
+        color: var(--text);
+        font-family: "Segoe UI", Arial, sans-serif;
+        overflow-y: auto;
+        scrollbar-width: none;
+    }
+
+    body::-webkit-scrollbar,
+    .scroll-area::-webkit-scrollbar,
+    .table-scroll::-webkit-scrollbar {
+        display: none;
+    }
+
+    button,
+    input {
+        font: inherit;
+    }
+
+    .page {
+        width: min(1150px, 100%);
+        margin: 0 auto;
+        padding: 28px 34px 30px;
+    }
+
+    .header {
+        margin-bottom: 14px;
+    }
+
+    .eyebrow {
+        color: var(--blue);
+        font-size: 14px;
+        font-weight: 700;
+        margin-bottom: 3px;
+    }
+
+    h1 {
+        margin: 0;
+        font-size: clamp(30px, 4vw, 36px);
+        line-height: 1.15;
+        letter-spacing: -0.5px;
+    }
+
+    .subtitle {
+        color: var(--muted);
+        font-size: 14px;
+        margin-top: 7px;
+    }
+
+    .card {
+        background: var(--white);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        box-shadow: var(--shadow);
+        margin: 12px 0;
+        overflow: hidden;
+    }
+
+    .section-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 20px 22px 12px;
+    }
+
+    .section-number {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 38px;
+        height: 30px;
+        padding: 0 9px;
+        border-radius: 4px;
+        background: var(--blue-light);
+        color: var(--blue);
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    .results-number {
+        background: var(--green-light);
+        color: var(--green);
+    }
+
+    .section-title {
+        font-size: 18px;
+        font-weight: 700;
+    }
+
+    .section-description {
+        color: var(--muted);
+        font-size: 12px;
+        margin-top: 2px;
+    }
+
+    .controls {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 8px;
+        padding: 12px 14px;
+        margin: 0 22px 12px;
+        background: #f8fafc;
+    }
+
+    .control-label {
+        font-size: 14px;
+        font-weight: 700;
+        margin-right: 2px;
+    }
+
+    .number-input {
+        width: 85px;
+        height: 42px;
+        padding: 8px 10px;
+        text-align: center;
+        border: 1px solid #94a3b8;
+        border-radius: 5px;
+        background: #fff;
+        color: var(--text);
+        outline: none;
+    }
+
+    .number-input:focus,
+    .data-input:focus {
+        border-color: var(--blue);
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, .12);
+    }
+
+    .btn {
+        border: 0;
+        border-radius: 6px;
+        padding: 10px 17px;
+        min-height: 42px;
+        cursor: pointer;
+        font-size: 14px;
+        font-weight: 700;
+        transition: transform .12s ease, background .12s ease;
+    }
+
+    .btn:active {
+        transform: translateY(1px);
+    }
+
+    .btn-primary {
+        background: var(--blue);
+        color: #fff;
+    }
+
+    .btn-primary:hover {
+        background: var(--blue-dark);
+    }
+
+    .btn-secondary {
+        background: #e2e8f0;
+        color: var(--text);
+    }
+
+    .btn-secondary:hover {
+        background: #cbd5e1;
+    }
+
+    .interval-type {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 16px;
+        padding: 0 22px 12px;
+        font-size: 13px;
+    }
+
+    .interval-type-title {
+        font-weight: 700;
+    }
+
+    .radio-label {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        cursor: pointer;
+        color: var(--text);
+    }
+
+    .radio-label input {
+        accent-color: var(--blue);
+    }
+
+    .hint {
+        color: var(--muted);
+        font-size: 12px;
+    }
+
+    /* Hidden-scrollbar child section */
+    .scroll-area {
+        overflow-y: auto;
+        scrollbar-width: none;
+        overscroll-behavior: contain;
+        padding: 0 22px 20px;
+    }
+
+    .input-scroll {
+        max-height: 270px;
+        min-height: 90px;
+    }
+
+    .results-scroll {
+        max-height: 620px;
+        min-height: 120px;
+    }
+
+    .placeholder {
+        text-align: center;
+        padding: 28px 10px;
+    }
+
+    .placeholder-title {
+        font-size: 14px;
+        font-weight: 700;
+    }
+
+    .placeholder-text {
+        color: var(--muted);
+        font-size: 12px;
+        margin-top: 5px;
+    }
+
+    .input-table {
+        border-collapse: separate;
+        border-spacing: 0;
+        width: 100%;
+        min-width: 480px;
+    }
+
+    .input-table th {
+        background: var(--slate);
+        color: white;
+        padding: 10px 8px;
+        font-size: 12px;
+        font-weight: 700;
+    }
+
+    .input-table th:first-child {
+        border-radius: 4px 0 0 0;
+    }
+
+    .input-table th:last-child {
+        border-radius: 0 4px 0 0;
+    }
+
+    .input-table td {
+        padding: 3px;
+    }
+
+    .data-input {
+        width: 100%;
+        height: 38px;
+        padding: 6px 9px;
+        text-align: center;
+        border: 1px solid #cbd5e1;
+        border-radius: 3px;
+        outline: none;
+        color: var(--text);
+        background: #fff;
+    }
+
+    .input-actions {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-top: 12px;
+    }
+
+    .small-muted {
+        color: var(--muted);
+        font-size: 12px;
+    }
+
+    .summary {
+        display: flex;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 28px;
+        background: var(--blue-light);
+        padding: 11px 14px;
+        margin-bottom: 14px;
+    }
+
+    .summary strong {
+        font-size: 13px;
+    }
+
+    .summary-value {
+        color: var(--blue);
+        font-size: 13px;
+        font-weight: 700;
+    }
+
+    .summary-muted {
+        color: var(--muted);
+        font-size: 12px;
+    }
+
+    .table-heading {
+        font-size: 16px;
+        font-weight: 700;
+        margin: 0 0 8px;
+    }
+
+    /* Table itself is horizontally scrollable only when needed */
+    .table-scroll {
+        width: 100%;
+        overflow-x: auto;
+        overflow-y: hidden;
+        scrollbar-width: none;
+        overscroll-behavior-x: contain;
+        margin-bottom: 14px;
+    }
+
+    .calc-table {
+        border-collapse: separate;
+        border-spacing: 0;
+        min-width: 930px;
+        width: 100%;
+    }
+
+    .calc-table th {
+        background: var(--slate);
+        color: #fff;
+        padding: 10px 8px;
+        font-size: 12px;
+        font-weight: 700;
+        white-space: nowrap;
+    }
+
+    .calc-table td {
+        padding: 9px 8px;
+        text-align: center;
+        font-size: 12px;
+        border: 1px solid var(--border);
+        border-top: 0;
+        white-space: nowrap;
+    }
+
+    .calc-table tbody tr:nth-child(even) td {
+        background: var(--row-alt);
+    }
+
+    .calc-table tfoot td {
+        background: #e2e8f0;
+        font-weight: 700;
+    }
+
+    .warning {
+        display: flex;
+        align-items: center;
+        gap: 7px;
+        background: var(--amber-light);
+        color: var(--text);
+        padding: 10px 12px;
+        margin-bottom: 12px;
+        font-size: 12px;
+    }
+
+    .warning strong {
+        color: var(--amber);
+    }
+
+    .methods-heading {
+        font-size: 16px;
+        font-weight: 700;
+        margin: 12px 0 8px;
+    }
+
+    .method-card {
+        background: #f8fafc;
+        border: 1px solid var(--border);
+        padding: 11px 14px;
+        margin: 5px 0;
+    }
+
+    .method-title {
+        font-size: 13px;
+        font-weight: 700;
+    }
+
+    .formula {
+        color: var(--muted);
+        font-size: 12px;
+        margin-top: 3px;
+    }
+
+    .substitution {
+        font-family: Consolas, "Courier New", monospace;
+        font-size: 13px;
+        margin-top: 7px;
+        overflow-wrap: anywhere;
+    }
+
+    .method-answer {
+        color: var(--green);
+        font-size: 14px;
+        font-weight: 700;
+        margin-top: 3px;
+    }
+
+    .final-answer {
+        background: var(--green-light);
+        text-align: center;
+        padding: 12px;
+        margin-top: 12px;
+    }
+
+    .final-label {
+        font-size: 13px;
+    }
+
+    .final-value {
+        color: var(--green);
+        font-size: 25px;
+        font-weight: 700;
+        margin-top: 2px;
+    }
+
+    .footer {
+        color: var(--muted);
+        font-size: 11px;
+        padding: 8px 0 2px;
+    }
+
+    .error-modal {
+        position: fixed;
+        inset: 0;
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        background: rgba(15, 23, 42, .35);
+        z-index: 1000;
+    }
+
+    .error-modal.show {
+        display: flex;
+    }
+
+    .error-box {
+        width: min(450px, 100%);
+        background: #fff;
+        border-radius: 12px;
+        box-shadow: 0 20px 60px rgba(15, 23, 42, .25);
+        padding: 22px;
+    }
+
+    .error-title {
+        color: #b91c1c;
+        font-size: 17px;
+        font-weight: 700;
+    }
+
+    .error-message {
+        white-space: pre-line;
+        color: var(--text);
+        font-size: 13px;
+        line-height: 1.5;
+        margin: 10px 0 18px;
+    }
+
+    .error-close {
+        width: 100%;
+    }
+
+    @media (max-width: 760px) {
+        .page {
+            padding: 20px 12px 24px;
+        }
+
+        .section-header {
+            padding: 16px 14px 10px;
+        }
+
+        .controls {
+            margin: 0 14px 10px;
+        }
+
+        .interval-type {
+            padding: 0 14px 10px;
+            gap: 10px;
+        }
+
+        .scroll-area {
+            padding: 0 14px 16px;
+        }
+
+        .input-scroll {
+            max-height: 300px;
+        }
+
+        .results-scroll {
+            max-height: 70vh;
+        }
+
+        .hint {
+            width: 100%;
+            padding-left: 28px;
+        }
+
+        .summary {
+            gap: 12px;
+        }
+    }
+
+    @media (max-width: 520px) {
+        .page {
+            padding: 16px 8px 20px;
+        }
+
+        h1 {
+            font-size: 29px;
+        }
+
+        .controls {
+            align-items: stretch;
+        }
+
+        .control-label {
+            width: 100%;
+        }
+
+        .number-input {
+            width: 90px;
+        }
+
+        .btn {
+            flex: 1;
+        }
+
+        .interval-type {
+            display: grid;
+            grid-template-columns: 1fr;
+        }
+
+        .hint {
+            padding-left: 0;
+        }
+    }
+</style>
+</head>
+
+<body>
+
+<main class="page">
+
+    <header class="header">
+        <div class="eyebrow">Statistics</div>
+        <h1>Mean Calculator</h1>
+        <div class="subtitle">
+            Calculate the arithmetic mean using Direct, Assumed Mean and Step-Deviation methods.
+        </div>
+    </header>
+
+    <!-- INPUT CARD -->
+    <section class="card">
+
+        <div class="section-header">
+            <div class="section-number">01</div>
+            <div>
+                <div class="section-title">Enter Data</div>
+                <div class="section-description">
+                    Create your frequency distribution table.
+                </div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <label class="control-label" for="numClasses">
+                Number of Classes
+            </label>
+
+            <input
+                id="numClasses"
+                class="number-input"
+                type="number"
+                min="1"
+                max="200"
+                step="1"
+                value=""
+                inputmode="numeric"
+            >
+
+            <button
+                id="createTableBtn"
+                class="btn btn-primary"
+                type="button"
+            >
+                Create Table
+            </button>
+
+            <button
+                id="clearBtn"
+                class="btn btn-secondary"
+                type="button"
+            >
+                Clear
+            </button>
+        </div>
+
+        <div class="interval-type">
+            <span class="interval-type-title">Class Interval Type:</span>
+
+            <label class="radio-label">
+                <input
+                    type="radio"
+                    name="intervalType"
+                    value="inclusive"
+                    checked
+                >
+                Inclusive (0–9, 10–19)
+            </label>
+
+            <label class="radio-label">
+                <input
+                    type="radio"
+                    name="intervalType"
+                    value="continuous"
+                >
+                Continuous (0–10, 10–20)
+            </label>
+
+            <span class="hint">
+                Select the format used by your question.
+            </span>
+        </div>
+
+        <div
+            id="inputScroll"
+            class="scroll-area input-scroll"
+        >
+            <div id="inputContent"></div>
+        </div>
+
+    </section>
+
+    <!-- RESULTS CARD -->
+    <section class="card">
+
+        <div class="section-header">
+            <div class="section-number results-number">02</div>
+            <div>
+                <div class="section-title">Calculation &amp; Results</div>
+                <div class="section-description">
+                    Complete working for all three methods.
+                </div>
+            </div>
+        </div>
+
+        <div
+            id="resultsScroll"
+            class="scroll-area results-scroll"
+        >
+            <div id="resultsContent"></div>
+        </div>
+
+    </section>
+
+    <footer class="footer">
+        Class 10 Statistics • Standard formulas are used.
+    </footer>
+
+</main>
+
+<!-- Error dialog -->
+<div id="errorModal" class="error-modal">
+    <div class="error-box">
+        <div class="error-title">Input Error</div>
+        <div id="errorMessage" class="error-message"></div>
+        <button
+            id="errorClose"
+            class="btn btn-primary error-close"
+            type="button"
+        >
+            Close
+        </button>
+    </div>
+</div>
+
+<script>
+"use strict";
+
+/*
+    ============================================================
+    CALCULATION LOGIC
+    ============================================================
+
+    This mirrors the Python application's calculation logic.
+
+    Direct Method:
+        Mean = Σ(fi × xi) / Σfi
+
+    Assumed Mean Method:
+        Mean = A + Σ(fi × di) / Σfi
+        di = xi - A
+
+    Step-Deviation Method:
+        Mean = A + h × Σ(fi × ui) / Σfi
+        ui = di / h
+
+    Interval conventions:
+        Inclusive:
+            0-9, 10-19, 20-29
+            h = upper - lower + 1
+
+        Continuous:
+            0-10, 10-20, 20-30
+            h = upper - lower
+*/
+
+// ============================================================
+// DOM
+// ============================================================
+
+const numClassesInput = document.getElementById("numClasses");
+const createTableBtn = document.getElementById("createTableBtn");
+const clearBtn = document.getElementById("clearBtn");
+
+const inputScroll = document.getElementById("inputScroll");
+const inputContent = document.getElementById("inputContent");
+
+const resultsScroll = document.getElementById("resultsScroll");
+const resultsContent = document.getElementById("resultsContent");
+
+const errorModal = document.getElementById("errorModal");
+const errorMessage = document.getElementById("errorMessage");
+const errorClose = document.getElementById("errorClose");
+
+let rows = [];
+
+// ============================================================
+// ERROR DIALOG
+// ============================================================
+
+function showError(message) {
+    errorMessage.textContent = message;
+    errorModal.classList.add("show");
+}
+
+function closeError() {
+    errorModal.classList.remove("show");
+}
+
+errorClose.addEventListener("click", closeError);
+
+errorModal.addEventListener("click", function (event) {
+    if (event.target === errorModal) {
+        closeError();
+    }
+});
+
+// ============================================================
+// UTILITIES
+// ============================================================
+
+function formatNumber(value) {
+    if (Math.abs(value - Math.round(value)) < 1e-9) {
+        return String(Math.round(value));
+    }
+
+    return Number(value.toFixed(4)).toString();
+}
+
+function getIntervalType() {
+    return document.querySelector(
+        'input[name="intervalType"]:checked'
+    ).value;
+}
+
+function updateIntervalPlaceholders() {
+    const type = getIntervalType();
+
+    rows.forEach((row, index) => {
+        row.intervalInput.placeholder =
+            type === "inclusive"
+                ? (index === 0 ? "e.g. 0-9" : "e.g. 10-19")
+                : (index === 0 ? "e.g. 0-10" : "e.g. 10-20");
+    });
+}
+
+function isFiniteNumber(value) {
+    return Number.isFinite(value);
+}
+
+// ============================================================
+// INTERVAL PARSER
+// ============================================================
+
+function parseInterval(text) {
+
+    text = text.trim();
+
+    if (!text) {
+        throw new Error("Class interval cannot be empty.");
+    }
+
+    text = text
+        .replace(/[–—]/g, "-")
+        .replace(/\s+to\s+/i, "-");
+
+    /*
+        Supports:
+            0-9
+            10-19
+            0 to 10
+            -10--1
+            -2.5-3.5
+    */
+    const pattern =
+        /^\s*([+-]?(?:\d+(?:\.\d*)?|\.\d+))\s*-\s*([+-]?(?:\d+(?:\.\d*)?|\.\d+))\s*$/;
+
+    const match = text.match(pattern);
+
+    if (!match) {
+        throw new Error(
+            `Invalid class interval: ${text}\n` +
+            "Use a format such as 0-9, 10-19 or 0-10."
+        );
+    }
+
+    const lower = Number(match[1]);
+    const upper = Number(match[2]);
+
+    if (!isFiniteNumber(lower) || !isFiniteNumber(upper)) {
+        throw new Error(
+            `Class limits must be finite numbers: ${text}`
+        );
+    }
+
+    if (upper <= lower) {
+        throw new Error(
+            `Upper limit must be greater than lower limit: ${text}`
+        );
+    }
+
+    return { lower, upper };
+}
+
+// ============================================================
+// VALIDATE INTERVALS
+// ============================================================
+
+function validateAndPrepareIntervals(data) {
+
+    if (!data.length) {
+        throw new Error(
+            "At least one class interval is required."
+        );
+    }
+
+    const convention = getIntervalType();
+
+    // Inclusive Class 10 intervals use whole-number limits.
+    if (convention === "inclusive") {
+
+        for (const row of data) {
+
+            if (
+                !Number.isInteger(row.lower) ||
+                !Number.isInteger(row.upper)
+            ) {
+                throw new Error(
+                    "Inclusive class intervals must use whole-number " +
+                    "limits, for example 0-9, 10-19, 20-29."
+                );
+            }
+        }
+    }
+
+    // Check ascending order, overlap, duplicates and gaps.
+    for (let i = 0; i < data.length - 1; i++) {
+
+        const current = data[i];
+        const next = data[i + 1];
+
+        const currentUpper = current.upper;
+        const nextLower = next.lower;
+
+        // Inclusive intervals cannot share an endpoint:
+        //   0-9, 10-19
+        //
+        // Continuous intervals are allowed to share the boundary:
+        //   0-10, 10-20
+        const overlaps =
+            convention === "inclusive"
+                ? nextLower <= currentUpper
+                : nextLower < currentUpper;
+
+        if (overlaps) {
+            throw new Error(
+                "Class intervals must be in ascending order and " +
+                "must not overlap or repeat.\n\n" +
+                `Problem between ` +
+                `${formatNumber(current.lower)}-${formatNumber(current.upper)} ` +
+                `and ${formatNumber(next.lower)}-${formatNumber(next.upper)}.`
+            );
+        }
+
+        const expectedLower =
+            convention === "inclusive"
+                ? currentUpper + 1
+                : currentUpper;
+
+        if (Math.abs(nextLower - expectedLower) > 1e-9) {
+            throw new Error(
+                "Class intervals must be consecutive.\n\n" +
+                `After the class ending at ` +
+                `${formatNumber(currentUpper)}, ` +
+                `the next lower limit should be ` +
+                `${formatNumber(expectedLower)}.`
+            );
+        }
+    }
+
+    const classWidths =
+        convention === "inclusive"
+            ? data.map(row => row.upper - row.lower + 1)
+            : data.map(row => row.upper - row.lower);
+
+    const h = classWidths[0];
+
+    const equalWidth = classWidths.every(
+        width => Math.abs(width - h) < 1e-9
+    );
+
+    return {
+        h,
+        equalWidth
+    };
+}
+
+// ============================================================
+// CREATE INPUT TABLE
+// ============================================================
+
+function createTable() {
+
+    const n = Number(numClassesInput.value);
+
+    if (
+        !Number.isInteger(n) ||
+        n <= 0 ||
+        n > 200
+    ) {
+        showError(
+            "Enter a valid positive whole number between 1 and 200."
+        );
+        return;
+    }
+
+    rows = [];
+
+    inputContent.innerHTML = "";
+
+    const table = document.createElement("table");
+    table.className = "input-table";
+
+    const thead = document.createElement("thead");
+    const headerRow = document.createElement("tr");
+
+    const h1 = document.createElement("th");
+    h1.textContent = "Class Interval";
+
+    const h2 = document.createElement("th");
+    h2.textContent = "Frequency (fi)";
+
+    headerRow.appendChild(h1);
+    headerRow.appendChild(h2);
+    thead.appendChild(headerRow);
+
+    const tbody = document.createElement("tbody");
+
+    for (let i = 0; i < n; i++) {
+
+        const tr = document.createElement("tr");
+
+        const intervalTd = document.createElement("td");
+        const frequencyTd = document.createElement("td");
+
+        const intervalInput = document.createElement("input");
+        intervalInput.className = "data-input";
+        intervalInput.type = "text";
+        intervalInput.placeholder =
+            getIntervalType() === "inclusive"
+                ? (i === 0 ? "e.g. 0-9" : "e.g. 10-19")
+                : (i === 0 ? "e.g. 0-10" : "e.g. 10-20");
+        intervalInput.autocomplete = "off";
+
+        const frequencyInput = document.createElement("input");
+        frequencyInput.className = "data-input";
+        frequencyInput.type = "number";
+        frequencyInput.step = "1";
+        frequencyInput.min = "0";
+        frequencyInput.inputMode = "numeric";
+        frequencyInput.placeholder = "fi";
+
+        intervalTd.appendChild(intervalInput);
+        frequencyTd.appendChild(frequencyInput);
+
+        tr.appendChild(intervalTd);
+        tr.appendChild(frequencyTd);
+
+        tbody.appendChild(tr);
+
+        rows.push({
+            intervalInput,
+            frequencyInput
+        });
+    }
+
+    table.appendChild(thead);
+    table.appendChild(tbody);
+
+    inputContent.appendChild(table);
+
+    const actions = document.createElement("div");
+    actions.className = "input-actions";
+
+    const calculateButton = document.createElement("button");
+    calculateButton.className = "btn btn-primary";
+    calculateButton.type = "button";
+    calculateButton.textContent = "Calculate Mean";
+    calculateButton.addEventListener(
+        "click",
+        calculate
+    );
+
+    const count = document.createElement("span");
+    count.className = "small-muted";
+    count.textContent = `${n} class interval(s)`;
+
+    actions.appendChild(calculateButton);
+    actions.appendChild(count);
+
+    inputContent.appendChild(actions);
+
+    // Focus first class interval exactly like the desktop app.
+    if (rows.length) {
+        rows[0].intervalInput.focus();
+    }
+
+    inputScroll.scrollTop = 0;
+}
+
+// ============================================================
+// CALCULATE
+// ============================================================
+
+function calculate() {
+
+    try {
+
+        const data = [];
+
+        for (const row of rows) {
+
+            const interval = row.intervalInput.value.trim();
+            const frequency = row.frequencyInput.value.trim();
+
+            if (!interval || !frequency) {
+                throw new Error(
+                    "Please fill all class intervals and frequencies."
+                );
+            }
+
+            const { lower, upper } =
+                parseInterval(interval);
+
+            const fi = Number(frequency);
+
+            if (!isFiniteNumber(fi)) {
+                throw new Error(
+                    "Frequency must be a finite number."
+                );
+            }
+
+            if (fi < 0) {
+                throw new Error(
+                    "Frequency cannot be negative."
+                );
+            }
+
+            if (!Number.isInteger(fi)) {
+                throw new Error(
+                    `Frequency must be a whole number: ${frequency}`
+                );
+            }
+
+            const xi = (lower + upper) / 2;
+
+            data.push({
+                lower,
+                upper,
+                fi,
+                xi
+            });
+        }
+
+        if (!data.length) {
+            return;
+        }
+
+        const {
+            h,
+            equalWidth
+        } = validateAndPrepareIntervals(data);
+
+        // Same assumed mean selection as desktop version.
+        const A =
+            data[Math.floor(data.length / 2)].xi;
+
+        let sumFi = 0;
+        let sumFixi = 0;
+        let sumFidi = 0;
+        let sumFiui = 0;
+
+        for (const row of data) {
+
+            const fi = row.fi;
+            const xi = row.xi;
+
+            // Direct Method
+            const fixi = fi * xi;
+
+            // Assumed Mean Method
+            const di = xi - A;
+            const fidi = fi * di;
+
+            // Step-Deviation Method
+            const ui = di / h;
+            const fiui = fi * ui;
+
+            row.fixi = fixi;
+            row.di = di;
+            row.fidi = fidi;
+            row.ui = ui;
+            row.fiui = fiui;
+
+            sumFi += fi;
+            sumFixi += fixi;
+            sumFidi += fidi;
+            sumFiui += fiui;
+        }
+
+        if (sumFi === 0) {
+            throw new Error(
+                "Total frequency must be greater than zero."
+            );
+        }
+
+        const directMean =
+            sumFixi / sumFi;
+
+        const assumedMean =
+            A + sumFidi / sumFi;
+
+        let stepMean = null;
+
+        if (equalWidth) {
+            stepMean =
+                A + h * sumFiui / sumFi;
+        }
+
+        displayResults({
+            data,
+            sumFi,
+            sumFixi,
+            sumFidi,
+            sumFiui,
+            A,
+            h,
+            directMean,
+            assumedMean,
+            stepMean,
+            equalWidth
+        });
+
+    } catch (error) {
+        showError(
+            error instanceof Error
+                ? error.message
+                : String(error)
+        );
+    }
+}
+
+// ============================================================
+// DISPLAY RESULTS
+// ============================================================
+
+function displayResults(result) {
+
+    const {
+        data,
+        sumFi,
+        sumFixi,
+        sumFidi,
+        sumFiui,
+        A,
+        h,
+        directMean,
+        assumedMean,
+        stepMean,
+        equalWidth
+    } = result;
+
+    resultsContent.innerHTML = "";
+
+    // Summary
+    const summary = document.createElement("div");
+    summary.className = "summary";
+
+    const summaryTitle = document.createElement("strong");
+    summaryTitle.textContent = "Calculation Values";
+
+    const summaryA = document.createElement("span");
+    summaryA.className = "summary-value";
+    summaryA.textContent =
+        `A = ${formatNumber(A)}`;
+
+    const summaryH = document.createElement("span");
+    summaryH.className = "summary-value";
+    summaryH.textContent =
+        `h = ${formatNumber(h)}`;
+
+    const convention = document.createElement("span");
+    convention.className = "summary-muted";
+    convention.textContent =
+        getIntervalType() === "inclusive"
+            ? "Inclusive"
+            : "Continuous";
+
+    summary.appendChild(summaryTitle);
+    summary.appendChild(summaryA);
+    summary.appendChild(summaryH);
+    summary.appendChild(convention);
+
+    resultsContent.appendChild(summary);
+
+    // Table heading
+    const heading = document.createElement("div");
+    heading.className = "table-heading";
+    heading.textContent = "Complete Calculation Table";
+    resultsContent.appendChild(heading);
+
+    // Horizontal calculation table
+    const tableScroll = document.createElement("div");
+    tableScroll.className = "table-scroll";
+
+    const table = document.createElement("table");
+    table.className = "calc-table";
+
+    const headers = [
+        "Class Interval",
+        "fi",
+        "xi",
+        "fi × xi",
+        "di = xi − A",
+        "fi × di",
+        "ui = di / h",
+        "fi × ui"
+    ];
+
+    const thead = document.createElement("thead");
+    const headerRow = document.createElement("tr");
+
+    for (const header of headers) {
+        const th = document.createElement("th");
+        th.textContent = header;
+        headerRow.appendChild(th);
+    }
+
+    thead.appendChild(headerRow);
+
+    const tbody = document.createElement("tbody");
+
+    data.forEach((row) => {
+
+        const tr = document.createElement("tr");
+
+        const values = [
+            `${formatNumber(row.lower)} - ${formatNumber(row.upper)}`,
+            formatNumber(row.fi),
+            formatNumber(row.xi),
+            formatNumber(row.fixi),
+            formatNumber(row.di),
+            formatNumber(row.fidi),
+            formatNumber(row.ui),
+            formatNumber(row.fiui)
+        ];
+
+        for (const value of values) {
+            const td = document.createElement("td");
+            td.textContent = value;
+            tr.appendChild(td);
+        }
+
+        tbody.appendChild(tr);
+    });
+
+    const tfoot = document.createElement("tfoot");
+    const totalRow = document.createElement("tr");
+
+    const totals = [
+        "TOTAL",
+        formatNumber(sumFi),
+        "",
+        formatNumber(sumFixi),
+        "",
+        formatNumber(sumFidi),
+        "",
+        formatNumber(sumFiui)
+    ];
+
+    for (const value of totals) {
+        const td = document.createElement("td");
+        td.textContent = value;
+        totalRow.appendChild(td);
+    }
+
+    tfoot.appendChild(totalRow);
+
+    table.appendChild(thead);
+    table.appendChild(tbody);
+    table.appendChild(tfoot);
+
+    tableScroll.appendChild(table);
+    resultsContent.appendChild(tableScroll);
+
+    // Warning for unequal widths
+    if (!equalWidth) {
+
+        const warning = document.createElement("div");
+        warning.className = "warning";
+
+        const strong = document.createElement("strong");
+        strong.textContent = "Warning";
+
+        const text = document.createElement("span");
+        text.textContent =
+            "Class intervals have unequal widths. " +
+            "Step-Deviation Method is not applicable.";
+
+        warning.appendChild(strong);
+        warning.appendChild(text);
+
+        resultsContent.appendChild(warning);
+    }
+
+    // Methods heading
+    const methodsHeading = document.createElement("div");
+    methodsHeading.className = "methods-heading";
+    methodsHeading.textContent = "Mean by Three Methods";
+    resultsContent.appendChild(methodsHeading);
+
+    const methods = [
+        {
+            title: "1. Direct Method",
+            formula: "Mean = Σ(fi × xi) / Σfi",
+            substitution:
+                `= ${formatNumber(sumFixi)} / ${formatNumber(sumFi)}`,
+            answer:
+                `= ${formatNumber(directMean)}`
+        },
+        {
+            title: "2. Assumed Mean Method",
+            formula: "Mean = A + Σ(fi × di) / Σfi",
+            substitution:
+                `= ${formatNumber(A)} + ` +
+                `(${formatNumber(sumFidi)} / ${formatNumber(sumFi)})`,
+            answer:
+                `= ${formatNumber(assumedMean)}`
+        },
+        {
+            title: "3. Step-Deviation Method",
+            formula: equalWidth
+                ? "Mean = A + h × Σ(fi × ui) / Σfi"
+                : "Not applicable: class intervals have unequal widths.",
+            substitution: equalWidth
+                ? `= ${formatNumber(A)} + ` +
+                  `${formatNumber(h)} × ` +
+                  `(${formatNumber(sumFiui)} / ${formatNumber(sumFi)})`
+                : "Use Direct Method or Assumed Mean Method.",
+            answer: equalWidth
+                ? `= ${formatNumber(stepMean)}`
+                : "N/A"
+        }
+    ];
+
+    for (const method of methods) {
+
+        const card = document.createElement("div");
+        card.className = "method-card";
+
+        const title = document.createElement("div");
+        title.className = "method-title";
+        title.textContent = method.title;
+
+        const formula = document.createElement("div");
+        formula.className = "formula";
+        formula.textContent = method.formula;
+
+        const substitution = document.createElement("div");
+        substitution.className = "substitution";
+        substitution.textContent = method.substitution;
+
+        const answer = document.createElement("div");
+        answer.className = "method-answer";
+        answer.textContent = method.answer;
+
+        card.appendChild(title);
+        card.appendChild(formula);
+        card.appendChild(substitution);
+        card.appendChild(answer);
+
+        resultsContent.appendChild(card);
+    }
+
+    // Final answer
+    const final = document.createElement("div");
+    final.className = "final-answer";
+
+    const finalLabel = document.createElement("div");
+    finalLabel.className = "final-label";
+    finalLabel.textContent = "Final Mean";
+
+    const finalValue = document.createElement("div");
+    finalValue.className = "final-value";
+    finalValue.textContent =
+        formatNumber(directMean);
+
+    final.appendChild(finalLabel);
+    final.appendChild(finalValue);
+
+    resultsContent.appendChild(final);
+
+    resultsScroll.scrollTop = 0;
+}
+
+// ============================================================
+// CLEAR
+// ============================================================
+
+function clearAll() {
+
+    numClassesInput.value = "";
+    rows = [];
+
+    document.querySelector(
+        'input[name="intervalType"][value="inclusive"]'
+    ).checked = true;
+
+    inputContent.innerHTML = `
+        <div class="placeholder">
+            <div class="placeholder-title">
+                Create a table to begin
+            </div>
+            <div class="placeholder-text">
+                Enter the number of class intervals above and click Create Table.
+            </div>
+        </div>
+    `;
+
+    resultsContent.innerHTML = `
+        <div class="placeholder">
+            <div class="placeholder-title">
+                No calculation yet
+            </div>
+            <div class="placeholder-text">
+                Your calculation table and answers will appear here.
+            </div>
+        </div>
+    `;
+
+    inputScroll.scrollTop = 0;
+    resultsScroll.scrollTop = 0;
+}
+
+// ============================================================
+// BUTTON EVENTS
+// ============================================================
+
+createTableBtn.addEventListener(
+    "click",
+    createTable
+);
+
+clearBtn.addEventListener(
+    "click",
+    clearAll
+);
+
+numClassesInput.addEventListener(
+    "keydown",
+    function (event) {
+        if (event.key === "Enter") {
+            createTable();
+        }
+    }
+);
+
+document.querySelectorAll(
+    'input[name="intervalType"]'
+).forEach((radio) => {
+    radio.addEventListener(
+        "change",
+        updateIntervalPlaceholders
+    );
+});
+
+// ============================================================
+// NESTED SCROLL CHAINING
+// ============================================================
+
+/*
+    Desired behavior:
+
+        Input table
+             ↓ reaches bottom
+        Main page
+             ↓
+        Results section
+             ↓ reaches bottom
+        Main page
+
+    The same concept applies upward.
+
+    On a touch device, normal native scrolling works.
+    The wheel handler below specifically gives desktop mouse
+    scrolling the same child-first -> parent behavior.
+*/
+
+function canScrollElement(element, direction) {
+
+    if (direction > 0) {
+        return (
+            element.scrollTop <
+            element.scrollHeight -
+            element.clientHeight -
+            1
+        );
+    }
+
+    return element.scrollTop > 1;
+}
+
+function wheelScroll(element, deltaY) {
+
+    const direction =
+        deltaY > 0 ? 1 : -1;
+
+    if (canScrollElement(element, direction)) {
+
+        element.scrollTop += deltaY;
+
+        return true;
+    }
+
+    return false;
+}
+
+function getScrollChain(startElement) {
+
+    const chain = [];
+
+    let element = startElement;
+
+    while (element && element !== document.body) {
+
+        if (
+            element.classList &&
+            (
+                element.classList.contains("scroll-area") ||
+                element === document.documentElement ||
+                element === document.body
+            )
+        ) {
+            chain.push(element);
+        }
+
+        element = element.parentElement;
+    }
+
+    chain.push(document.documentElement);
+
+    return [...new Set(chain)];
+}
+
+document.addEventListener(
+    "wheel",
+    function (event) {
+
+        // Let horizontal scrolling behave normally.
+        if (Math.abs(event.deltaX) > Math.abs(event.deltaY)) {
+            return;
+        }
+
+        const chain =
+            getScrollChain(event.target);
+
+        const deltaY =
+            event.deltaY;
+
+        for (const element of chain) {
+
+            if (wheelScroll(element, deltaY)) {
+                event.preventDefault();
+                return;
+            }
+        }
+
+        // At the top/bottom of all nested areas, allow the browser
+        // to handle the event naturally.
+    },
+    {
+        passive: false
+    }
+);
+
+// ============================================================
+// INITIAL CONTENT
+// ============================================================
+
+clearAll();
+
+</script>
+
+</body>
+</html>
